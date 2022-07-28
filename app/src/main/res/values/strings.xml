@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">RoomDemo</string>
+    <string name="subscriber_details">Subscriber Details</string>
+    <string name="please_enter_your_name">Please enter your name</string>
+    <string name="please_enter_your_email_address">Please enter your email address</string>
+    <string name="submit">Submit</string>
+    <string name="clear_all">Clear all</string>
+</resources>
