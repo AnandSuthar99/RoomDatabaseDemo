@@ -1,6 +1,7 @@
 package com.example.roomdemo
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -30,32 +31,30 @@ class MainActivity : AppCompatActivity() {
         factory = SubscriberViewModelFactory(subscriberRepository)
         subscriberViewModel = ViewModelProvider(this, factory)[SubscriberViewModel::class.java]
 
+        subscribersAdapter =
+            SubscribersAdapter(subscribers, object : SubscribersAdapter.SubscriberClickListener {
+                override fun onSubscriberClicked(subscriber: Subscriber) {
+                    subscriberViewModel.initUpdateOrDelete(subscriber)
+                }
+            })
+
         activityMainBinding.subscriberViewModel = subscriberViewModel
         activityMainBinding.lifecycleOwner = this
 
-        subscribersAdapter = SubscribersAdapter(subscribers)
-        activityMainBinding.rvSubscribers.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        activityMainBinding.rvSubscribers.layoutManager =
+            LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         activityMainBinding.rvSubscribers.adapter = subscribersAdapter
 
-        activityMainBinding.btnSubmit.setOnClickListener {
-            val name = activityMainBinding.etName.text.toString()
-            val email = activityMainBinding.etEmail.text.toString()
-
-            val newSubscriber = Subscriber(0, name, email)
-            subscriberViewModel.insert(newSubscriber)
-        }
-
-        activityMainBinding.btnClearAll.setOnClickListener {
-            subscriberViewModel.deleteAll()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
         subscriberViewModel.subscribers.observe(this) {
             subscribers.clear()
             subscribers.addAll(it)
             subscribersAdapter.notifyDataSetChanged()
+        }
+
+        subscriberViewModel.operationStatus.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                Toast.makeText(MainActivity@ this, it, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
